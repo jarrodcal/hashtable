@@ -184,8 +184,13 @@ void ht_insert_he(hash_table *table, hash_entry *entry){
     // walk down the chain until we either hit the end
     // or find an identical key (in which case we replace
     // the value)
+    
+    int count = 1;
+    
     while(tmp->next != NULL)
     {
+        count++;
+        
         if(he_key_compare(tmp, entry))
             break;
         else
@@ -206,6 +211,13 @@ void ht_insert_he(hash_table *table, hash_entry *entry){
         table->collisions += 1;
         table->key_count ++;
         table->current_load_factor = (double)table->collisions / table->array_size;
+        
+        //保存哈希表中发生冲突最多的下标和数目
+        if (count > table->max_collisions)
+        {
+            table->max_collisions = count;
+            table->max_collisions_index = index;
+        }
 
         // double the size of the table if autoresize is on and the
         // load factor has gone too high
