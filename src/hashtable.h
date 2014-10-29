@@ -51,6 +51,12 @@ typedef struct hash_table {
 
     /// The current load factor.
     double current_load_factor;
+    
+    //max index collisions count
+    int max_collisions_index;
+    
+    //max collisions count
+    int max_collisions;
 
 } hash_table;
 
