@@ -105,7 +105,8 @@ int main(int argc, char *argv[])
         {
             size_t value_size;
             int value;
-
+            
+            //void 转化为实际取地址内容的方法
             value = *(int*)ht_get(&ht, &(many_keys[i]), sizeof(many_keys[i]), &value_size);
 
             if(value != many_values[i])
