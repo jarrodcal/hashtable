@@ -491,6 +491,7 @@ void he_destroy(int flags, hash_entry *entry)
 
 int he_key_compare(hash_entry *e1, hash_entry *e2)
 {
+    //void转换为char *类型进行转换
     char *k1 = e1->key;
     char *k2 = e2->key;
 
