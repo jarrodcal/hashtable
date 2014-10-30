@@ -225,7 +225,9 @@ void ht_insert_he(hash_table *table, hash_entry *entry){
 
         // double the size of the table if autoresize is on and the
         // load factor has gone too high
-        if (!(table->flags & HT_NO_AUTORESIZE) && (table->current_load_factor > table->max_load_factor))
+        // add max_collisions condition ?
+        if (!(table->flags & HT_NO_AUTORESIZE) && (table->current_load_factor > table->max_load_factor) && (table->max_collisions > 10))
+        //if (!(table->flags & HT_NO_AUTORESIZE) && (table->current_load_factor > table->max_load_factor))
         {
             debug("max_index is %d, max_collisions is %d \n", table->max_collisions_index, table->collisions);
             
