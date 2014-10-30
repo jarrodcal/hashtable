@@ -113,6 +113,8 @@ void ht_init(hash_table *table, ht_flags flags, double max_load_factor
     table->flags                = flags;
     table->max_load_factor      = max_load_factor;
     table->current_load_factor  = 0.0;
+    table->max_collisions = 0;
+    table->max_collisions_index = 0;
 
     unsigned int i;
     for(i = 0; i < table->array_size; i++)
@@ -150,6 +152,8 @@ void ht_destroy(hash_table *table)
     table->array_size = 0;
     table->key_count = 0;
     table->collisions = 0;
+    table->max_collisions = 0;
+    table->max_collisions_index = 0;
     free(table->array);
     table->array = NULL;
 }
@@ -212,7 +216,7 @@ void ht_insert_he(hash_table *table, hash_entry *entry){
         table->key_count ++;
         table->current_load_factor = (double)table->collisions / table->array_size;
         
-        //保存哈希表中发生冲突最多的下标和数目
+        //保存哈希表中发生冲突最多的下标和数目, 便于观察和修改resize的策略
         if (count > table->max_collisions)
         {
             table->max_collisions = count;
@@ -221,13 +225,12 @@ void ht_insert_he(hash_table *table, hash_entry *entry){
 
         // double the size of the table if autoresize is on and the
         // load factor has gone too high
-        if(!(table->flags & HT_NO_AUTORESIZE) &&
-                (table->current_load_factor > table->max_load_factor)) 
+        if (!(table->flags & HT_NO_AUTORESIZE) && (table->current_load_factor > table->max_load_factor))
         {
             debug("max_index is %d, max_collisions is %d \n", table->max_collisions_index, table->collisions);
+            
             ht_resize(table, table->array_size * 2);
-            table->current_load_factor =
-                (double)table->collisions / table->array_size;
+            table->current_load_factor = (double)table->collisions / table->array_size;
         }
     }
 }
@@ -398,6 +401,8 @@ void ht_resize(hash_table *table, unsigned int new_size)
     new_table.collisions = 0;
     new_table.flags = table->flags;
     new_table.max_load_factor = table->max_load_factor;
+    new_table.max_collisions_index = 0;
+    new_table.max_collisions = 0;
 
     unsigned int i;
     for(i = 0; i < new_table.array_size; i++)
@@ -428,7 +433,8 @@ void ht_resize(hash_table *table, unsigned int new_size)
     table->array = new_table.array;
     table->key_count = new_table.key_count;
     table->collisions = new_table.collisions;
-
+    table->max_collisions_index = new_table.max_collisions_index;
+    table->max_collisions = new_table.max_collisions;
 }
 
 void ht_set_seed(uint32_t seed){
